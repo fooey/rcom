@@ -38,7 +38,7 @@ function writeOptions(){
 
 function setOptions(){
 	options = _.defaults(getQueryParams(), defaultOptions);
-	options.users = options.users.split(',');
+	options.users = (options.users) ? options.users.split(',') : [];
 }
 
 function getQueryParams(){
@@ -236,6 +236,7 @@ function getOptionsHtml(){
 						userHtml.push(getUserInput(user));
 						return userHtml;
 					}, []).join('')
+				+ getUserInput()
 			+ '</div>'
 
 			+ '<div class="row">'
