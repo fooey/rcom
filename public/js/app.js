@@ -4,14 +4,20 @@ var options = {};
 var defaultOptions = {
 	rpp: 20
 }
-
-var $results;
-var $options;
 var converter = new Showdown.converter();
 
+var $options, $results;
+var optionsTemplate, userInputTemplate;
+var listingTemplate, postTemplate
+
 $(function(){
-	$results = $('#results');
 	$options = $('#options');
+	optionsTemplate = _.template($('#optionsTemplate').html());
+	userInputTemplate = _.template($('#userInputTemplate').html());
+	
+	$results = $('#results');
+	listingTemplate = _.template($('#listingTemplate').html());
+	postTemplate = _.template($('#postTemplate').html());
 
 
 	setOptions();
@@ -32,13 +38,15 @@ $(function(){
 *	Options / State
 */
 
-function writeOptions(){
-	$options.html(getOptionsHtml());
-}
-
 function setOptions(){
 	options = _.defaults(getQueryParams(), defaultOptions);
 	options.users = (options.users || 'alienth,bsimpson,Dacvak,hueypriest,kemitche,rram,spladug').split(',');
+}
+
+function writeOptions(){
+	$options.html(
+		optionsTemplate({options: options})
+	);
 }
 
 function getQueryParams(){
@@ -137,15 +145,18 @@ function renderComments(err, comments){
 		_.chain(comments)
 		.sortBy(function(post){return -(_.parseInt(post.data.created_utc))})
 		.slice(0, options.rpp)
+		.map(function(post){
+			post.momentCreated = moment(post.data.created_utc * 1000);
+			post.commentsLink = 'http://redd.it/' + post.data.link_id.split('_')[1].toString();
+			post.subredditLink = 'http://reddit.com/r/' + post.data.subreddit;
+			return post;
+		})
 		.value()
 	);
 
-
-	var toAppend = []; // one dom update
-	_.each(comments, function(comment){
-		toAppend.push(getRowHtml(comment))
-	}); 
-	$results.append(toAppend);
+	$results.html(
+		listingTemplate({comments: comments})
+	);
 }
 
 
@@ -184,84 +195,7 @@ function unsetBadUser(user) {
 */
 
 function getRowHtml(post){
-	var momentCreated = moment(post.data.created_utc * 1000);
-	var comments = 'http://redd.it/' + post.data.link_id.split('_')[1].toString();
-	var sub = 'http://reddit.com/r' + post.data.subreddit;
-
-
-	return $('<div class="row comment"><div class="col-lg-12">'
-		+ '<div class="title">'
-			+ '<a href="' + post.data.link_url + '">'
-				+ post.data.link_title 
-			+ '</a>'
-		+ '</div>'
-		+ '<div class="meta">'
-			+ '<span class="when" title="' + momentCreated.format() + '">' + momentCreated.fromNow() + '</span>'
-			+ '<span class="author">'
-				+ '<a href="http://reddit.com/u/' + post.data.author + '">'
-					+ post.data.author 
-				+ '</a>'
-			+ '</span>'
-			+ '<span class="sub"><a href="' + sub + '">/r/' + post.data.subreddit + '</a></span>'
-			+ '<span class="comments"><a href="' + comments + '">comments</a></span>'
-		+ '</div>'
-		+ '<span class="toggle glyphicon glyphicon-chevron-down"></span>'
-		+ '<blockquote>'
-			+ '<div class="post snipp">' + post.data.body + '</div>'
-			+ '<div class="post full">' + converter.makeHtml(post.data.body) + '</div>'
-		+ '</blockquote>'
-	+ '</div></div>');
-}
-
-
-
-
-/*
-*	Option Templating
-*/
-
-function getOptionsHtml(){
-	return $('<div class="row comment"><div class="col-lg-12"><form class="form" action="/">'
-		+ '<fieldset>'
-			// + '<legend>Options</legend>'
-
-			+ '<div class="form-group form-group-sm">'
-				+ '<label for="rpp">Max Results</label>'
-				+ '<input type="numeric" class="form-control input-sm"" name="rpp" id="rpp" value="' + options.rpp + '">'
-			+ '</div>'
-
-			+ '<div class="form-group" id="users">'
-				+ '<label for="rpp">Users</label>'
-				+ _.reduce(options.users, function(userHtml, user){
-						userHtml.push(getUserInput(user));
-						return userHtml;
-					}, []).join('')
-				+ getUserInput()
-			+ '</div>'
-
-			+ '<div class="row">'
-				+ '<div class="col-sm-6">'
-					+ '<button class="btn btn-block btn-sm btn-primary submit"><span class="glyphicon glyphicon-refresh"></span> Update</button>'
-				+ '</div>'
-				+ '<div class="col-sm-6">'
-					+ '<button class="btn btn-block btn-sm btn-success add-user"><span class="glyphicon glyphicon-plus"></span> Add User</button>'
-				+ '</div>'
-			+ '</div>'
-		+ '</fieldset>'
-	+ '</form></div></div>');
-}
-
-function getUserInput(user) {
-	var userName = ((user) ? user : '');
-	var userId = 'user-' + ((user) ? userName : 'null')
-
-	return (
-		'<div class="userGroup input-group input-group-sm" id="' + userId + '">'
-			+ '<input type="text" class="form-control user" name="users" value="' + userName + '">'
-			+ '<div class="remove-user input-sm input-group-addon"><span class="glyphicon glyphicon-minus"></span></div>'
-		+ "</div>"
-	);
-
+	return $(postTemplate({post: post}));
 }
 
 
