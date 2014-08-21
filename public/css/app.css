@@ -1,0 +1,67 @@
+
+
+#options{
+	margin-top: .5em;
+}
+#options label{
+	font-size: 8pt;
+}
+
+#users .userGroup + .userGroup{
+	margin-top: 2px;
+}
+#users .remove-user{
+	cursor: pointer;
+}
+
+
+
+.comment + .comment {
+	margin-top: 1em;
+}
+
+.title {
+	font-size: 11pt;
+	margin: 1em 0 0;
+	padding: 0;
+}
+.meta {
+	margin: 0 0 0 8px;
+	font-size: 9pt;
+}
+.meta span {
+	display: inline-block;
+}
+.meta span + span {
+	padding-left: 1em;
+}
+
+.toggle {
+	float: left;
+	display: inline-block;
+	width: 28px;
+	cursor: pointer;
+	text-align: center;
+	margin: 12px 0;
+}
+
+blockquote {
+	margin: 4px 0 0 28px;
+	padding: 8px 12px;
+}
+
+
+.post {
+	font-size: 10pt;
+}
+
+.post.snipp {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.post.full {
+	display: none;
+	white-space: normal;
+}
