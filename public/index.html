@@ -31,7 +31,7 @@
 
 
 
-	 <script type="text/template" id="optionsTemplate">
+	<script type="text/template" data-key="/options">
 		<form class="form" action="/">
 			<fieldset>
 
@@ -43,9 +43,9 @@
 				<div class="form-group" id="users">
 					<label for="rpp">Users</label>
 					<% _.each(options.users, function(user){  %>
-						<%= userInputTemplate({user: user}) %>
+						<%= templates['/options/userInput']({user: user}) %>
 					<%	}); %>
-					<%= userInputTemplate({user: ''}) %>
+					<%= templates['/options/userInput']({user: ''}) %>
 				</div>
 
 				<div class="row">
@@ -60,22 +60,22 @@
 		</form>
 	</script>
 
-	 <script type="text/template" id="userInputTemplate">
+	<script type="text/template" data-key="/options/userInput">
 		<div class="userGroup input-group input-group-sm" id="'user-'<%- user %>">
 			<input type="text" class="form-control user" name="users" value="<%- user %>">
 			<div class="remove-user input-sm input-group-addon"><span class="glyphicon glyphicon-minus"></span></div>
 		</div>
-	 </script>
+	</script>
 
 
 
-	 <script type="text/template" id="listingTemplate">
+	<script type="text/template" data-key="/listing">
 		<% _.each(comments, function(post){  %>
-			<%= postTemplate({post: post}) %>
+			<%= templates['/listing/post']({post: post}) %>
 		<%	}); %>
-	 </script>
+	</script>
 
-	 <script type="text/template" id="postTemplate">
+	<script type="text/template" data-key="/listing/post">
 		<div class="row comment"><div class="col-lg-12">
 			<div class="title">
 				<a href="<%- post.data.link_url %>"><%= post.data.link_title %></a>
@@ -93,10 +93,10 @@
 			<span class="toggle glyphicon glyphicon-chevron-down"></span>
 			<blockquote>
 				<div class="post snipp"><%= post.data.body %></div>
-				<div class="post full"><%= converter.makeHtml(post.data.body) %></div>
+				<div class="post full"><%= post.markdownHtml %></div>
 			</blockquote>
 		</div></div>
-	 </script>
+	</script>
 
 
 

@@ -1,31 +1,25 @@
-
-var options = {};
 var defaultOptions = {
 	rpp: 20
 }
-var converter = new Showdown.converter();
 
-var $options, $results;
-var optionsTemplate, userInputTemplate;
-var listingTemplate, postTemplate
+var $options, $results
 
 $(function(){
 	$options = $('#options');
-	optionsTemplate = _.template($('#optionsTemplate').html());
-	userInputTemplate = _.template($('#userInputTemplate').html());
-	
 	$results = $('#results');
-	listingTemplate = _.template($('#listingTemplate').html());
-	postTemplate = _.template($('#postTemplate').html());
+
 
 
 	async.auto({
-		'setOptions': setOptions,
-		'writeOptions': ['setOptions', writeOptions],
-		'writeComments': ['setOptions', writeComments],
+		'options': setOptions,
+		'templates': compileTemplates,
+		'writeOptions': ['templates', 'options', writeOptions],
+		'writeComments': ['templates', 'options', writeComments],
 	});
 
-	$results.on('click', '.toggle', onCommentToggle)
+
+	$results.on('click', '.toggle', onCommentToggle);
+
 	$options.on('click', '.add-user', onAddUser)
 		.on('click', '.remove-user', onRemoveUser)
 		.on('submit', 'form', onSubmit);
@@ -36,20 +30,44 @@ $(function(){
 
 
 /*
-*	Options / State
+*	Templates
 */
 
-function writeOptions(fnCallback){
-	$options.html(
-		optionsTemplate({options: options})
-	);
+function compileTemplates(fnCallback) {
+	var $templates = $('script[type="text/template"]');
 
-	fnCallback();
+	var templates = {};
+
+	async.each(
+		$templates,
+		function(template, next) {
+			var $template = $(template);
+			templates[$template.data('key')] = _.template($template.html());
+			next();
+		},
+		function(err) {
+			fnCallback(null, templates);
+		}
+	)
 }
+
+
+
+/*
+*	Options / State
+*/
 
 function setOptions(fnCallback){
 	options = _.defaults(getQueryParams(), defaultOptions);
 	options.users = (options.users || 'alienth,bsimpson,Dacvak,hueypriest,kemitche,rram,spladug').split(',');
+	fnCallback(null, options);
+}
+
+function writeOptions(fnCallback, results){
+	$options.html(
+		results.templates['/options']({options: results.options, templates: results.templates})
+	);
+
 	fnCallback();
 }
 
@@ -116,11 +134,11 @@ function onSubmit(e) {
 *	Comments
 */
 
-function writeComments(fnCallback){
+function writeComments(fnCallback, results){
 	async.concat(
-		options.users, 
+		results.options.users, 
 		getUserComments,
-		renderComments.bind(null, fnCallback)
+		renderComments.bind(null, results.templates, fnCallback)
 	);
 }
     
@@ -144,7 +162,9 @@ function onUserCommentsError(user, fnCallback) {
 }
 
 
-function renderComments(fnCallback, err, comments){
+function renderComments(templates, fnCallback, err, comments){
+	var converter = new Showdown.converter();
+
 	var comments = (
 		_.chain(comments)
 		.sortBy(function(post){return -(_.parseInt(post.data.created_utc))})
@@ -153,13 +173,17 @@ function renderComments(fnCallback, err, comments){
 			post.momentCreated = moment(post.data.created_utc * 1000);
 			post.commentsLink = 'http://redd.it/' + post.data.link_id.split('_')[1].toString();
 			post.subredditLink = 'http://reddit.com/r/' + post.data.subreddit;
+			post.markdownHtml = converter.makeHtml(post.data.body);
 			return post;
 		})
 		.value()
 	);
 
 	$results.html(
-		listingTemplate({comments: comments})
+		templates['/listing']({
+			comments: comments,
+			templates: templates
+		})
 	);
 
 	fnCallback();
