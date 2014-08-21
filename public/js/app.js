@@ -38,7 +38,7 @@ function writeOptions(){
 
 function setOptions(){
 	options = _.defaults(getQueryParams(), defaultOptions);
-	options.users = (options.users) ? options.users.split(',') : [];
+	options.users = (options.users || 'alienth,bsimpson,Dacvak,hueypriest,kemitche,rram,spladug').split(',');
 }
 
 function getQueryParams(){
