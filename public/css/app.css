@@ -14,6 +14,17 @@
 	cursor: pointer;
 }
 
+#loading h1 {
+	font-size: 64pt;
+	margin-bottom: .5em;
+}
+
+.progress {
+	margin-top: 1em;
+}
+.progress-bar {
+	width: 100%;
+}
 
 
 .comment + .comment {
