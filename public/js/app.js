@@ -1,5 +1,4 @@
 
-// var users = [];
 var options = {};
 var defaultOptions = {
 	rpp: 20
@@ -20,14 +19,16 @@ $(function(){
 	postTemplate = _.template($('#postTemplate').html());
 
 
-	setOptions();
-	writeOptions();
-	writeComments();
+	async.auto({
+		'setOptions': setOptions,
+		'writeOptions': ['setOptions', writeOptions],
+		'writeComments': ['setOptions', writeComments],
+	});
 
-	$results.on('click', '.toggle', onCommentToggle);
-	$options.on('click', '.add-user', onAddUser);
-	$options.on('click', '.remove-user', onRemoveUser);
-	$options.on('submit', 'form', onSubmit);
+	$results.on('click', '.toggle', onCommentToggle)
+	$options.on('click', '.add-user', onAddUser)
+		.on('click', '.remove-user', onRemoveUser)
+		.on('submit', 'form', onSubmit);
 });
 
 
@@ -38,15 +39,18 @@ $(function(){
 *	Options / State
 */
 
-function setOptions(){
-	options = _.defaults(getQueryParams(), defaultOptions);
-	options.users = (options.users || 'alienth,bsimpson,Dacvak,hueypriest,kemitche,rram,spladug').split(',');
-}
-
-function writeOptions(){
+function writeOptions(fnCallback){
 	$options.html(
 		optionsTemplate({options: options})
 	);
+
+	fnCallback();
+}
+
+function setOptions(fnCallback){
+	options = _.defaults(getQueryParams(), defaultOptions);
+	options.users = (options.users || 'alienth,bsimpson,Dacvak,hueypriest,kemitche,rram,spladug').split(',');
+	fnCallback();
 }
 
 function getQueryParams(){
@@ -112,11 +116,11 @@ function onSubmit(e) {
 *	Comments
 */
 
-function writeComments(){
+function writeComments(fnCallback){
 	async.concat(
 		options.users, 
 		getUserComments,
-		renderComments
+		renderComments.bind(null, fnCallback)
 	);
 }
     
@@ -140,7 +144,7 @@ function onUserCommentsError(user, fnCallback) {
 }
 
 
-function renderComments(err, comments){
+function renderComments(fnCallback, err, comments){
 	var comments = (
 		_.chain(comments)
 		.sortBy(function(post){return -(_.parseInt(post.data.created_utc))})
@@ -157,6 +161,8 @@ function renderComments(err, comments){
 	$results.html(
 		listingTemplate({comments: comments})
 	);
+
+	fnCallback();
 }
 
 
@@ -186,16 +192,6 @@ function unsetBadUser(user) {
 	$('#user' + user)
 		.removeClass('has-error')
 		.attr('title', '');
-}
-
-
-
-/*
-*	Comment Templating
-*/
-
-function getRowHtml(post){
-	return $(postTemplate({post: post}));
 }
 
 
