@@ -15,14 +15,15 @@ $(function(){
 		'templates': compileTemplates,
 		'writeOptions': ['templates', 'options', writeOptions],
 		'writeComments': ['templates', 'options', writeComments],
+	}, function(err, results){
+		$results.on('click', '.toggle', onCommentToggle);
+
+		$options.on('click', '.add-user', onAddUser.bind(null, results.templates))
+			.on('click', '.remove-user', onRemoveUser)
+			.on('submit', 'form', onSubmit);
 	});
 
 
-	$results.on('click', '.toggle', onCommentToggle);
-
-	$options.on('click', '.add-user', onAddUser)
-		.on('click', '.remove-user', onRemoveUser)
-		.on('submit', 'form', onSubmit);
 });
 
 
@@ -195,9 +196,9 @@ function renderComments(templates, fnCallback, err, comments){
 *	Users
 */
 
-function onAddUser(e) {
+function onAddUser(templates, e) {
 	e.preventDefault();
-	var $newInput = $(getUserInput());
+	var $newInput =  templates['/options/userInput']({user: null});
 	$options.find('#users').append($newInput);
 }
 
