@@ -94,6 +94,10 @@
 				</span>
 				<span class="sub"><a href="<%- post.subredditLink %>">/r/<%- post.data.subreddit %></a></span>
 				<span class="comments"><a href="<%- post.commentsLink %>">comments</a></span>
+				<span class="permalink"><a href="<%- post.permalink %>">permalink</a></span>
+				<% if(post.data.parent_id.split('_')[0] !== 't3'){  %>
+					<span class="parentlink"><a href="<%- post.parentlink %>">context</a></span>
+				<%	} %>
 			</div>
 			<span class="toggle glyphicon glyphicon-chevron-down"></span>
 			<blockquote>

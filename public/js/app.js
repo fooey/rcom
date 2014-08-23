@@ -172,8 +172,10 @@ function renderComments(templates, fnCallback, err, comments){
 		.slice(0, options.rpp)
 		.map(function(post){
 			post.momentCreated = moment(post.data.created_utc * 1000);
-			post.commentsLink = 'http://redd.it/' + post.data.link_id.split('_')[1].toString();
-			post.subredditLink = 'http://reddit.com/r/' + post.data.subreddit;
+			post.subredditLink = 'http://www.reddit.com/r/' + post.data.subreddit;
+			post.commentsLink = post.subredditLink + '/comments/' + post.data.link_id.split('_')[1].toString();
+			post.permalink = post.commentsLink + '//' + post.data.id;
+			post.parentlink = post.commentsLink + '//' + post.data.parent_id.split('_')[1];
 			post.markdownHtml = converter.makeHtml(post.data.body);
 			return post;
 		})
