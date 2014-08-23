@@ -1,0 +1,27 @@
+<form class="form" action="/">
+	<fieldset>
+
+		<div class="form-group form-group-sm">
+			<label for="rpp">Max Results</label>
+			<input type="text" class="form-control input-sm" name="rpp" id="rpp" value="<%= options.rpp %>">
+		</div>
+
+		<div class="form-group" id="users">
+			<label for="rpp">Users</label>
+			<% _.each(options.users, function(user){  %>
+				<%= templates['/options/userInput']({user: user}) %>
+			<%	}); %>
+			<%= templates['/options/userInput']({user: ''}) %>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6">
+				<button class="btn btn-block btn-sm btn-primary submit"><span class="glyphicon glyphicon-refresh"></span> Update</button>
+			</div>
+			<div class="col-sm-6">
+				<button class="btn btn-block btn-sm btn-success add-user"><span class="glyphicon glyphicon-plus"></span> Add User</button>
+			</div>
+		</div>
+		
+	</fieldset>
+</form>

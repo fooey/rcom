@@ -1,0 +1,29 @@
+<div class="row comment"><div class="col-lg-12">
+
+	<div class="title">
+		<a href="<%- post.data.link_url %>"><%= post.data.link_title %></a>
+	</div>
+
+	<div class="meta">
+		<span class="when" title="<%- post.momentCreated.format() %>"><%- post.momentCreated.fromNow() %></span>
+		<span class="author">
+			<a href="http://reddit.com/u/<%- post.data.author %>">
+				<%- post.data.author %>
+			</a>
+		</span>
+		<span class="sub"><a href="<%- post.subredditLink %>">/r/<%- post.data.subreddit %></a></span>
+		<span class="comments"><a href="<%- post.commentsLink %>">comments</a></span>
+		<span class="permalink"><a href="<%- post.permalink %>">permalink</a></span>
+		<% if (post.data.parent_id.split('_')[0] !== 't3') {  %>
+			<span class="parentlink"><a href="<%- post.parentlink %>">context</a></span>
+		<% } %>
+	</div>
+
+	<span class="toggle glyphicon glyphicon-chevron-down"></span>
+
+	<blockquote>
+		<div class="post snipp"><%= post.data.body %></div>
+		<div class="post full"><%= post.markdownHtml %></div>
+	</blockquote>
+
+</div></div>
