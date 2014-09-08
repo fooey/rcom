@@ -164,7 +164,7 @@ function onUserCommentsError(user, fnCallback) {
 
 
 function renderComments(templates, fnCallback, err, comments){
-	var converter = new Showdown.converter();
+	var converter = SnuOwnd.getParser();
 
 	var comments = (
 		_.chain(comments)
@@ -176,7 +176,7 @@ function renderComments(templates, fnCallback, err, comments){
 			post.commentsLink = post.subredditLink + '/comments/' + post.data.link_id.split('_')[1].toString();
 			post.permalink = post.commentsLink + '//' + post.data.id;
 			post.parentlink = post.commentsLink + '//' + post.data.parent_id.split('_')[1];
-			post.markdownHtml = converter.makeHtml(post.data.body);
+			post.markdownHtml = converter.render(post.data.body);
 			return post;
 		})
 		.value()
@@ -231,7 +231,5 @@ function onCommentToggle(e) {
 	$toggle
 		.toggleClass('glyphicon-chevron-down')
 		.toggleClass('glyphicon-chevron-up')
-		.siblings('blockquote')
-			.find('.snipp').toggle().end()
-			.find('.full').toggle().end()
+		.siblings('blockquote').toggleClass('snipp')
 }

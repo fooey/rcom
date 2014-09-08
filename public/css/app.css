@@ -56,23 +56,23 @@
 	margin: 12px 0;
 }
 
-blockquote {
+
+
+blockquote.post {
 	margin: 4px 0 0 28px;
 	padding: 8px 12px;
-}
-
-
-.post {
 	font-size: 10pt;
+	white-space: normal;
+	max-height: auto;
+	max-width: 50em;
 }
 
-.post.snipp {
+blockquote.post.snipp {
+	max-height: 2.8em;
+}
+blockquote.post.snipp, 
+blockquote.post.snipp > * {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.post.full {
-	display: none;
-	white-space: normal;
 }
