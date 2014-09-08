@@ -146,7 +146,7 @@ function writeComments(fnCallback, results){
 
 function getUserComments(user, fnCallback){
 	$.ajax({
-		url: 'http://api.reddit.com/user/' + user + '/comments/new.json', 
+		url: 'https://api.reddit.com/user/' + user + '/comments/new.json', 
 		success: onUserComments.bind(null, user, fnCallback),
 		error: onUserCommentsError.bind(null, user, fnCallback),
 	});
