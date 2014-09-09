@@ -166,28 +166,26 @@ function onUserCommentsError(user, fnCallback) {
 function renderComments(templates, fnCallback, err, comments){
 	var converter = SnuOwnd.getParser();
 
-	var comments = (
-		_.chain(comments)
-		.sortBy(function(post){return -(_.parseInt(post.data.created_utc))})
-		.slice(0, options.rpp)
-		.map(function(post){
-			post.momentCreated = moment(post.data.created_utc * 1000);
-			post.subredditLink = 'http://www.reddit.com/r/' + post.data.subreddit;
-			post.commentsLink = post.subredditLink + '/comments/' + post.data.link_id.split('_')[1].toString();
-			post.permalink = post.commentsLink + '//' + post.data.id;
-			post.parentlink = post.commentsLink + '//' + post.data.parent_id.split('_')[1];
-			post.markdownHtml = converter.render(post.data.body);
-			return post;
-		})
-		.value()
-	);
+	var $comments = $(
+			_.chain(comments)
+			.sortBy(function(post){return -(_.parseInt(post.data.created_utc))})
+			.slice(0, options.rpp)
+			.map(function(post){
+				post.momentCreated = moment(post.data.created_utc * 1000);
+				post.subredditLink = 'http://www.reddit.com/r/' + post.data.subreddit;
+				post.commentsLink = post.subredditLink + '/comments/' + post.data.link_id.split('_')[1].toString();
+				post.permalink = post.commentsLink + '//' + post.data.id;
+				post.parentlink = post.commentsLink + '//' + post.data.parent_id.split('_')[1];
+				post.markdownHtml = converter.render(post.data.body);
 
-	$results.html(
-		templates['/listing']({
-			comments: comments,
-			templates: templates
-		})
-	);
+				return templates['/listing/post']({post: post});
+			})
+			.value()
+			.join('')
+		)
+		.hide()
+		.appendTo($results.empty())
+		.velocity("transition.slideUpIn", {stagger: 150, duration: 300})
 
 	fnCallback();
 }
@@ -200,8 +198,10 @@ function renderComments(templates, fnCallback, err, comments){
 
 function onAddUser(templates, e) {
 	e.preventDefault();
-	var $newInput =  templates['/options/userInput']({user: null});
-	$options.find('#users').append($newInput);
+	var $newInput = $(templates['/options/userInput']({user: null}))
+		.hide()
+		.appendTo('#users')
+		.velocity("transition.expandIn", 300);
 }
 
 function onRemoveUser(e) {
